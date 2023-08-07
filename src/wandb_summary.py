@@ -49,6 +49,7 @@ def summarize(run_id, team, project, summary, scale, unit):
     """
     api = wandb.Api()
     run = api.run(f"{team}/{project}/{run_id}")
+    CONSOLE.print(f"We'll have a looking at run `{run.name} - {run.id}`.")
     keys = _filter_keys(list(run.summary.keys()))
     x_axis = "epoch" if run.job_type == "train" else "_step"
     #FIXME: If all keys are not defined for the whole row, then it is not returned
