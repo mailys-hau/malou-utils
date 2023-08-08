@@ -3,26 +3,28 @@ import h5py
 
 from pathlib import Path
 
-from pretty import CONSOLE
+from pretty import CONSOLE, loading_spinner
 
 
 
-def add_dataset(dname, key, value, group=None, tab=' '):
-    CONSOLE.print(f"{tab}Going through {dname.name}...")
-    for fname in dname.iterdir():
+def add_dataset(dname, key, value, progress, group=None, tab="├── "):
+    CONSOLE.print(f"{tab}Going through [dir]{dname.name}[/]")
+    tab = "│   " + tab
+    tid = progress.add_task('', total=None)
+    for fname in progress.track(dname.iterdir(), task_id=tid, description=''):
         if fname.suffix != ".h5":
             if fname.is_dir():
-                add_dataset(fname, key, value, group, tab + ' ')
+                add_dataset(fname, key, value, progress, group, tab)
             else:
-                CONSOLE.print(f"{tab} {fname.name} not an HDF, skipping it. [sassy]At least give me proper files.[/]")
+                CONSOLE.print(f"{tab}{fname.stem}[sassy-err]{fname.suffix}[/]? [sassy]Give me a proper file.[/]")
             continue
         hdf = h5py.File(fname, 'a')
         if group is not None:
-            foo = hdf
             hdf = hdf[group]
         #TODO? Handle if dataset already exist
         hdf.create_dataset(key, data=value)
         hdf.file.close() # If you went down to a group, `.file` is needed
+    progress.remove_task(tid)
 
 
 
@@ -43,20 +45,21 @@ def add_info(dname, key, value, group, recursive):
     \b
     DNAME    DIR    Directory containing HDFs.
     """
-    CONSOLE.print(f"Going through {dname.name}.")
-    for fname in dname.iterdir():
-        if fname.suffix != ".h5":
-            if fname.is_dir() and recursive:
-                add_dataset(fname, key, value, group=group)
-            else:
-                CONSOLE.print(f" {fname.name} not an HDF, skipping it. [sassy]At least give me proper files.[/]")
-            continue
-        hdf = h5py.File(fname, 'w')
-        if group is not None:
-            hdf = hdf[group]
-        #TODO? Handle if dataset already exist
-        hdf.create_dataset(key, data=value)
-        hdf.close()
+    CONSOLE.print(f". Going through [dir]{dname.name}[/]")
+    with loading_spinner(CONSOLE) as progress:
+        for fname in progress.track(dname.iterdir(), description=''):
+            if fname.suffix != ".h5":
+                if fname.is_dir() and recursive:
+                    add_dataset(fname, key, value, progress, group=group)
+                else:
+                    CONSOLE.print(f"├── {fname.stem}[sassy-err]{fname.suffix}[/]? [sassy]Give me a proper file.[/]")
+                continue
+            hdf = h5py.File(fname, 'w')
+            if group is not None:
+                hdf = hdf[group]
+            #TODO? Handle if dataset already exist
+            hdf.create_dataset(key, data=value)
+            hdf.close()
     CONSOLE.print("[happy]I'm done! :blush:[/]")
 
 
