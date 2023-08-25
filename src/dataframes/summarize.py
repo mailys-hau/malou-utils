@@ -36,9 +36,6 @@ def last(df, order='', dropna=False):
     df = _dropna(df) if dropna else df
     return {"last": [ f"{last:.2f}" for last in df.iloc[-1] ]}
 
-def best_last(df, order="min", dropna=False):
-    return best(df, order) | last(df)
-
 
 def alls(df, order="min", dropna=False):
     out = {}

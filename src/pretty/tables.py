@@ -17,7 +17,7 @@ def _add_rows(table, df, func, section):
     return table
 
 
-def get_table(df, func, cols, title='', sections=[]):
+def get_table(df, funcs, cols, title='', sections=[]):
     table = Table(title=title)
     if sections:
         table.add_column("Section", style="grey74", justify="right")
@@ -25,10 +25,12 @@ def get_table(df, func, cols, title='', sections=[]):
     for col in cols:
         table.add_column(col, style=COLORS.get(col[-1], "gold1"), justify="center")
     try:
-        table = _add_rows(table, df[cols], func, '')
+        for f in funcs:
+            table = _add_rows(table, df[cols], f, '')
     except KeyError:
         pass # Some metrics are only computed for validation for example, so no default
     for sec in sections:
         table.add_section()
-        table = _add_rows(table, df[[f"{sec[0]}_{col}" for col in cols]], func, sec)
+        for f in funcs:
+            table = _add_rows(table, df[[f"{sec[0]}_{col}" for col in cols]], f, sec)
     return table

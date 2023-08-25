@@ -34,13 +34,13 @@ def _filter_keys(keys):
             help="Weight & Bias team associated to the run.")
 @cli.option("--project", "-p", default="3DMV-multi-segmentation",
             help="Weight & Bias project associated to the run.")
-@cli.option("--summary-type", "-st", "summary", type=cli.Choice(SUMMARIES.keys()),
-            default="mean_std", help="Summary function to use.")
+@cli.option("--summary-type", "-st", "summaries", type=cli.Choice(SUMMARIES.keys()),
+            default=["mean_std"], multiple=True, help="Summary function to use.")
 @cli.option("--distance-scale", "-s", "scale", default=1.0,
             help="Value to multiply distance metrics with to go to given unit.")
 @cli.option("--distance-unit", "-u", "unit", default="mm",
             help="Distances' unit.")
-def summarize(run_id, team, project, summary, scale, unit):
+def summarize(run_id, team, project, summaries, scale, unit):
     """
     Summarize a given Weights & bias run.
 
@@ -76,9 +76,14 @@ def summarize(run_id, team, project, summary, scale, unit):
             if not c in acols:
                 acols.append(c)
     # FIXME: get best or last for validation
-    func = SUMMARIES[summary]
-    dist = get_table(hist * scale, func, dcols, f"Distance metrics ({unit})", sections)
-    accu = get_table(hist * 100, lambda df: func(df, "max"), acols, f"Accuracy metrics (%)", sections)
+    dfuncs = [ SUMMARIES[s] for s in summaries ]
+    afuncs = []
+    #for s in summaries:
+    #    print(s)
+    #    afuncs.append(lambda df: SUMMARIES[s](df, "max"))
+    afuncs = [ lambda df, f=SUMMARIES[s]: f(df, "max") for s in summaries ]
+    dist = get_table(hist * scale, dfuncs, dcols, f"Distance metrics ({unit})", sections)
+    accu = get_table(hist * 100, afuncs, acols, f"Accuracy metrics (%)", sections)
     CONSOLE.print(dist, accu)
 
 
