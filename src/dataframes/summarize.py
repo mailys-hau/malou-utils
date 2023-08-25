@@ -16,7 +16,7 @@ def _dropna(df):
                        " Following computation will not include concerned rows.[/]")
     return df
 
-def mean_std(df, order="", dropna=True):
+def mean_std(df, order='', dropna=True):
     df = _dropna(df) if dropna else df
     return {"mean ± std": [ f"{mean:.2f} ± {std:.2f}" for mean, std in zip(df.mean(), df.std()) ]}
 
@@ -26,7 +26,13 @@ def best(df, order="min", dropna=True):
     res = df.min() if order == "min" else df.max()
     return {"best": [ f"{best:.2f}" for best in res ]}
 
-def last(df, dropna=False):
+def worst(df, order="min", dropna=True):
+    df = _dropna(df) if dropna else df
+    # Inverted because we want worst and not best
+    res = df.min() if order == "max" else df.max()
+    return {"worst": [ f"{worst:.2f}" for worst in res ]}
+
+def last(df, order='', dropna=False):
     df = _dropna(df) if dropna else df
     return {"last": [ f"{last:.2f}" for last in df.iloc[-1] ]}
 
