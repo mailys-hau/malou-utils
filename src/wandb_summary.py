@@ -64,11 +64,15 @@ def summarize(run_id, team, project, summary, scale, unit):
         elif not "validation" in sections and col.startswith("v_"):
             sections.append("validation")
         if any(d in col for d in DIST):
-            c = col.strip("v_").strip("p_")
+            c = col
+            if col.startswith("v_") or col.startswith("p_"):
+                c = col[2:]
             if not c in dcols:
                 dcols.append(c)
         elif any(a in col for a in ACCU):
-            c = col.strip("v_").strip("p_")
+            c = col
+            if col.startswith("v_") or col.startswith("p_"):
+                c = col[2:]
             if not c in acols:
                 acols.append(c)
     # FIXME: get best or last for validation
