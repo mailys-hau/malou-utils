@@ -12,5 +12,5 @@ CONSOLE = Console(theme=_theme)
 
 
 
-from pretty.tables import get_table
+from pretty.tables import get_table, format_line
 from pretty.progresses import *

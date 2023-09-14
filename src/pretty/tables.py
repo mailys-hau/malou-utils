@@ -6,7 +6,8 @@ from rich.table import Table
 
 
 
-COLORS = {'1': "magenta", '2': "cyan"}
+COLORS = {'1': "magenta", '2': "cyan",
+          "anterior": "magenta", "posterior": "cyan"}
 
 
 
@@ -15,6 +16,17 @@ def _add_rows(table, df, func, section):
     for sec, k in zip_longest([section], res.keys(), fillvalue=''):
         table.add_row(sec, k, *res[k])
     return table
+
+
+def format_line(data, precision=5):
+    line = data.tolist()
+    out = []
+    for elt in line:
+        if isinstance(elt, str):
+            out.append(elt)
+        else:
+            out.append(f"{elt:.{precision}f}")
+    return out
 
 
 def get_table(df, funcs, cols, title='', sections=[]):
