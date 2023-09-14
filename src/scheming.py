@@ -5,7 +5,7 @@ from multiprocessing import Pool
 from pathlib import Path
 
 from pretty import CONSOLE, loading_bar
-from utils import load_hdf
+from utils import load_hdf2vox
 
 
 
@@ -17,7 +17,7 @@ def _do_plot(params):
     if fname.suffix != ".h5":
         CONSOLE.print(f"[warning]`{fname.name}` don't give a fuck about that one, not loading it.[/]")
         return
-    inp, tg, pred = load_hdf(fname)
+    inp, tg, pred = load_hdf2vox(fname)
     oname = odir.joinpath(fname.name).with_suffix(".html")
     # FIXME: Accept whatever echoviz function
     if set_scale is not None:
