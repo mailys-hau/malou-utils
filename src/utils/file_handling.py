@@ -54,7 +54,8 @@ def load_hdf2vox(fname, has_pred=True):
         vinp = vinp[0]
         for k in vtg.keys():
             vtg[k] = vtg[k][0]
-            vpr[k] = vpr[k][0]
+            if has_pred:
+                vpr[k] = vpr[k][0]
     return vinp, vtg, vpr
 
 def load_hdf(fname, has_pred=True):
